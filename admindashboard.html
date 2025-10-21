@@ -1,0 +1,139 @@
+<!DOCTYPE html> 
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin - Dashboard</title>
+    <link rel="icon" type="image/x-icon" href="javakeylogo.png">
+    <link rel="stylesheet" href="admindashboard.css">
+  </head>
+  <body>
+    <div id="loading">Loading Dashboard...</div>
+    <div class="sidebar" id="sidebar">
+      <button class="close-btn" id="closeBtn">✖</button>
+      <img src="javakeylogo.png" alt="JavaKey Logo" class="logo">
+      <a href="admindashboard.html" class="active">Dashboard</a>
+      <a href="adminleaderboards.html">Leaderboards</a>
+      <a href="adminusers.html">Students</a>
+      <a href="#" id="logout">Logout</a>
+    </div>
+    <div class="main-content">
+      <div class="header">
+        <button class="menu-toggle" id="menuToggle">☰</button>
+        <h2>Dashboard</h2>
+      </div>
+
+      <div class="dashboard">
+        <div class="card">
+          <h3>Registered Students</h3>
+          <p id="userCount">0</p>
+        </div>
+
+        <div class="card">
+          <h3>Top Performers</h3>
+          <div id="topPerformers">Loading...</div>
+        </div>
+      </div>
+    </div>
+
+    <footer>&copy; 2025 JavaKey | Admin Dashboard</footer>
+
+    <script type="module">
+      import { auth } from "./firebaseconfig.js";
+      import { signOut } from "https://www.gstatic.com/firebasejs/10.7.2/firebase-auth.js";
+      import {
+        getFirestore,
+        collection,
+        getDocs
+      } from "https://www.gstatic.com/firebasejs/10.7.2/firebase-firestore.js";
+      import { checkSession } from "./authcheck.js";
+
+      const db = getFirestore();
+      const loading = document.getElementById("loading");
+      const sidebar = document.getElementById("sidebar");
+      const menuToggle = document.getElementById("menuToggle");
+      const closeBtn = document.getElementById("closeBtn");
+
+      checkSession().then(() => {
+        loadDashboardData();
+      });
+
+      async function loadDashboardData() {
+        try {
+          const usersSnap = await getDocs(collection(db, "users"));
+          document.getElementById("userCount").textContent = usersSnap.size;
+
+          let leaderboard = [];
+
+          for (const userDoc of usersSnap.docs) {
+            const userData = userDoc.data();
+            const stageTimesRef = collection(db, "users", userDoc.id, "stageTimes");
+            const stageTimesSnap = await getDocs(stageTimesRef);
+
+            let bestTime = Infinity;
+            let bestStage = "Unknown Stage";
+
+            stageTimesSnap.forEach(stageDoc => {
+              const stageData = stageDoc.data();
+              if (stageData.bestTime && stageData.bestTime < bestTime) {
+                bestTime = stageData.bestTime;
+                bestStage = stageData.stage || stageDoc.id || "Unknown Stage";
+              }
+            });
+
+            if (bestTime !== Infinity) {
+              leaderboard.push({
+                fullname: userData.fullname || "No Name",
+                section: userData.section || "N/A",
+                bestTime: bestTime,
+                stage: bestStage
+              });
+            }
+          }
+
+          leaderboard.sort((a, b) => a.bestTime - b.bestTime);
+
+          const topPerformers = leaderboard.slice(0, 3);
+          const topPerformersDiv = document.getElementById("topPerformers");
+
+          if (topPerformers.length > 0) {
+            topPerformersDiv.innerHTML = topPerformers.map((user, index) => {
+              const minutes = Math.floor(user.bestTime / 60);
+              const seconds = Math.floor(user.bestTime % 60)
+                .toString()
+                .padStart(2, "0");
+              const formattedTime = `${minutes}:${seconds}`;
+              const rank = index + 1;
+              return `
+                <p style="color: #ffffff;"><strong>#${rank}</strong> ${user.fullname} | ${user.section} | ${formattedTime} (${user.stage})</p>
+                ${index < topPerformers.length - 1 ? '<div class="divider"></div>' : ''}
+              `;
+            }).join("");
+          } else {
+            topPerformersDiv.textContent = "No data available";
+          }
+        } catch (err) {
+          console.error("Error loading dashboard data:", err);
+          document.getElementById("topPerformers").textContent = "Error loading data";
+        } finally {
+          loading.style.display = "none";
+        }
+      }
+
+      document.getElementById("logout").addEventListener("click", async (e) => {
+        e.preventDefault();
+        try {
+          await signOut(auth);
+          localStorage.removeItem("isAdmin");
+          alert("Logged out successfully!");
+          window.location.href = "index.html";
+        } catch (err) {
+          alert("Error logging out: " + err.message);
+        }
+      });
+
+      menuToggle.addEventListener("click", () => sidebar.classList.add("show"));
+      closeBtn.addEventListener("click", () => sidebar.classList.remove("show"));
+    </script>
+  </body>
+</html>

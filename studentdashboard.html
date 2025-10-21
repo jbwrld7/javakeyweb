@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Student Dashboard</title>
+    <link rel="icon" type="image/x-icon" href="javakeylogo.png">
+    <link rel="stylesheet" href="studentdashboard.css">
+  </head>
+<body>
+  <div id="loading">Checking session...</div>
+
+  <div class="sidebar" id="sidebar">
+    <button class="close-btn" id="closeBtn">X</button>
+    <img src="javakeylogo.png" alt="JavaKey Logo" class="logo">
+    <a href="studentdashboard.html">Dashboard</a>
+    <a href="progress.html">Progress</a>
+    <a href="settings.html">Settings</a>
+    <a href="#" id="logout">Logout</a>
+  </div>
+
+  <div class="main-content">
+    <div class="header">
+      <div style="display: flex; align-items: center;">
+        <button class="menu-toggle" id="menuToggle">☰</button>
+        <h2>Dashboard</h2>
+      </div>
+      <div class="user-info">Welcome, <span id="username">Loading...</span></div>
+    </div>
+
+    <div class="dashboard">
+      <div class="card">
+        <h3>Leaderboards</h3>
+        <div id="leaderboards">Loading...</div>
+      </div>
+    </div>
+  </div>
+  <footer>&copy; 2025 JavaKey | All Rights Reserved</footer>
+  <script type="module">
+    import { auth } from "./firebaseconfig.js";
+    import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.2/firebase-firestore.js";
+    import { signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.2/firebase-auth.js";
+    import { checkSession } from "./authcheck.js";
+
+    const db = getFirestore();
+    const loading = document.getElementById("loading");
+    const usernameDisplay = document.getElementById("username");
+    const leaderboardDiv = document.getElementById("leaderboards");
+
+    let currentUserName = "";
+
+    checkSession().then(() => {
+      loading.style.display = "none";
+    });
+
+    async function loadLeaderboard() {
+      try {
+        const usersSnap = await getDocs(collection(db, "users"));
+        let leaderboard = [];
+
+        for (const userDoc of usersSnap.docs) {
+          const userData = userDoc.data();
+          const stageTimesRef = collection(db, "users", userDoc.id, "stageTimes");
+          const stageTimesSnap = await getDocs(stageTimesRef);
+
+          let bestTime = Infinity;
+          let bestStage = "Unknown";
+
+          stageTimesSnap.forEach(stageDoc => {
+            const data = stageDoc.data();
+            if (data.bestTime && data.bestTime < bestTime) {
+              bestTime = data.bestTime;
+              bestStage = data.stage || stageDoc.id || "Unknown";
+            }
+          });
+
+          if (bestTime !== Infinity) {
+            leaderboard.push({
+              fullname: userData.fullname || "No Name",
+              section: userData.section || "N/A",
+              bestTime,
+              stage: bestStage
+            });
+          }
+        }
+
+        leaderboard.sort((a, b) => a.bestTime - b.bestTime);
+        const topPerformers = leaderboard.slice(0, 5);
+
+        if (topPerformers.length > 0) {
+          leaderboardDiv.innerHTML = topPerformers.map((u, i) => {
+            const mins = Math.floor(u.bestTime / 60);
+            const secs = String(Math.floor(u.bestTime % 60)).padStart(2, "0");
+            const formatted = `${mins}:${secs}`;
+
+            const isCurrentUser = u.fullname === currentUserName;
+            const highlightClass = isCurrentUser ? "highlight" : "";
+
+            return `
+              <p class="${highlightClass}"><strong style="color: #0ea400;">#${i + 1}</strong> ${u.fullname} | ${u.section} | ${formatted} (${u.stage})</p>
+              ${i < topPerformers.length - 1 ? '<div class="divider"></div>' : ''}
+            `;
+          }).join("");
+        } else {
+          leaderboardDiv.textContent = "No leaderboard data available.";
+        }
+      } catch (err) {
+        console.error("Error loading leaderboard:", err);
+        leaderboardDiv.textContent = "Failed to load leaderboard.";
+      }
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const userRef = doc(db, "users", user.uid);
+        const docSnap = await getDoc(userRef);
+        if (docSnap.exists()) {
+          const userData = docSnap.data();
+          currentUserName = userData.fullname || "Student";
+          usernameDisplay.textContent = currentUserName;
+        } else {
+          usernameDisplay.textContent = "Student";
+        }
+        await loadLeaderboard();
+      } else {
+        usernameDisplay.textContent = "Guest";
+        leaderboardDiv.textContent = "Please log in to see leaderboard.";
+      }
+    });
+
+    document.getElementById("logout").addEventListener("click", async (e) => {
+      e.preventDefault();
+      try {
+        await signOut(auth);
+        alert("Logged out successfully!");
+        window.location.href = "index.html";
+      } catch (err) {
+        alert("Error logging out: " + err.message);
+      }
+    });
+
+    const sidebar = document.getElementById("sidebar");
+    const menuToggle = document.getElementById("menuToggle");
+    const closeBtn = document.getElementById("closeBtn");
+
+    menuToggle.addEventListener("click", () => sidebar.classList.add("show"));
+    closeBtn.addEventListener("click", () => sidebar.classList.remove("show"));
+  </script>
+</body>
+</html>

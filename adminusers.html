@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin - Users</title>
+    <link rel="icon" type="image/x-icon" href="javakeylogo.png">
+    <link rel="stylesheet" href="adminuser.css">
+  </head>
+  <body>
+    <div id="loading">Loading Users...</div>
+    <div class="sidebar" id="sidebar">
+      <button class="close-btn" id="closeBtn">X</button>
+      <img class="logo" src="javakeylogo.png" alt="logo" />
+      <a href="admindashboard.html">Dashboard</a>
+      <a href="adminleaderboards.html">Leaderboards</a>
+      <a href="adminusers.html" style="background:#10bb00;">Students</a>
+      <a href="#" id="logout">Logout</a>
+    </div>
+    <div class="main-content">
+      <div class="header">
+        <button class="menu-toggle" id="menuToggle">☰</button>
+        <h2>Students</h2>
+      </div>
+      <h1>Registered Students</h1>
+      <div class="controls">
+        <input type="text" id="searchInput" placeholder="Search by name or section...">
+      </div>
+      <table class="user-table">
+        <thead>
+          <tr>
+            <th data-sort="number">#</th>
+            <th data-sort="string">Full Name</th>
+            <th data-sort="string">Email</th>
+            <th data-sort="string">Section</th>
+          </tr>
+        </thead>
+        <tbody id="userTableBody"></tbody>
+      </table>
+    </div>
+    <footer>&copy; 2025 JavaKey | Admin Dashboard</footer>
+    <script type="module">
+      import { auth } from "./firebaseconfig.js";
+      import { signOut } from "https://www.gstatic.com/firebasejs/10.7.2/firebase-auth.js";
+      import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.2/firebase-firestore.js";
+      import { checkSession } from "./authcheck.js";
+
+      const db = getFirestore();
+      const loading = document.getElementById("loading");
+      const userTableBody = document.getElementById("userTableBody");
+      const searchInput = document.getElementById("searchInput");
+
+      let usersData = [];
+
+      checkSession().then(() => {
+        loading.style.display = "none";
+        loadUsers();
+      });
+
+      async function loadUsers() {
+        try {
+          const snapshot = await getDocs(collection(db, "users"));
+          let index = 1;
+          usersData = [];
+          snapshot.forEach(doc => {
+            const data = doc.data();
+            usersData.push({
+              index: index++,
+              fullname: data.fullname || "N/A",
+              email: data.email || "N/A",
+              section: data.section || "N/A",
+            });
+          });
+          renderTable(usersData);
+        } catch (err) {
+          console.error("Error loading users:", err);
+          userTableBody.innerHTML = `<tr><td colspan="4">Error loading users.</td></tr>`;
+        }
+      }
+
+      function renderTable(data) {
+        userTableBody.innerHTML = "";
+        data.forEach(user => {
+          const row = `
+            <tr>
+              <td>${user.index}</td>
+              <td>${user.fullname}</td>
+              <td>${user.email}</td>
+              <td>${user.section}</td>
+            </tr>
+          `;
+          userTableBody.insertAdjacentHTML("beforeend", row);
+        });
+      }
+
+      searchInput.addEventListener("input", (e) => {
+        const value = e.target.value.toLowerCase();
+        const filtered = usersData.filter(user =>
+          user.fullname.toLowerCase().includes(value) ||
+          user.section.toLowerCase().includes(value)
+        );
+        renderTable(filtered);
+      });
+
+      document.querySelectorAll(".user-table th").forEach(header => {
+        header.addEventListener("click", () => {
+          const sortType = header.dataset.sort;
+          const column = header.textContent.trim().toLowerCase();
+          let key = column.includes("name") ? "fullname" :
+                    column.includes("email") ? "email" :
+                    column.includes("section") ? "section" : "index";
+          const sorted = [...usersData].sort((a, b) => {
+            if (sortType === "string") {
+              return a[key].localeCompare(b[key]);
+            } else {
+              return a[key] - b[key];
+            }
+          });
+          renderTable(sorted);
+        });
+      });
+
+      document.getElementById("logout").addEventListener("click", async (e) => {
+        e.preventDefault();
+        await signOut(auth);
+        localStorage.removeItem("isAdmin");
+        alert("Logged out successfully!");
+        window.location.href = "index.html";
+      });
+
+      const sidebar = document.getElementById("sidebar");
+      const menuToggle = document.getElementById("menuToggle");
+      const closeBtn = document.getElementById("closeBtn");
+
+      menuToggle.addEventListener("click", () => sidebar.classList.add("show"));
+      closeBtn.addEventListener("click", () => sidebar.classList.remove("show"));
+    </script>
+  </body>
+</html>

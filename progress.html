@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/x-icon" href="javakeylogo.png">
+    <title>Progress</title>
+    <link rel="stylesheet" href="progress.css">
+    <script type="module" src="progress.js" defer></script>
+    <script type="module" src="authcheck.js" defer></script>
+  </head>
+  <body>
+    <div class="sidebar" id="sidebar">
+      <button class="close-btn" id="closeBtn">&times;</button>
+      <div class="logo-container">
+        <img src="javakeylogo.png" alt="JavaKey Logo" class="logo" />
+      </div>
+      <a href="studentdashboard.html">Dashboard</a>
+      <a href="progress.html" class="active">Progress</a>
+      <a href="settings.html">Settings</a>
+      <a href="#" id="logout">Logout</a>
+    </div>
+    <div class="main-content">
+      <div class="header">
+        <button class="menu-toggle" id="menuToggle">☰</button>
+        <h1>Progress</h1>
+        <p>Your current game progress is displayed below.</p>
+      </div>
+      <div class="progress-container">
+        <div class="user-info">
+          <h2 id="userFullName"></h2>
+          <p id="userSection"></p>
+        </div>
+      </div>
+    <footer>&copy; 2025 JavaKey | All Rights Reserved</footer>
+    <script type="module">
+      import { auth, checkSession } from "./authcheck.js";
+      import { signOut } from "https://www.gstatic.com/firebasejs/10.7.2/firebase-auth.js";
+      import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.2/firebase-firestore.js";
+
+      const db = getFirestore();
+
+      const sidebar = document.getElementById("sidebar");
+      const menuToggle = document.getElementById("menuToggle");
+      const closeBtn = document.getElementById("closeBtn");
+
+      menuToggle.addEventListener("click", () => sidebar.classList.add("active"));
+      closeBtn.addEventListener("click", () => sidebar.classList.remove("active"));
+
+      document.getElementById("logout").addEventListener("click", (e) => {
+        e.preventDefault();
+        signOut(auth).then(() => {
+          alert("Logged out successfully!");
+          window.location.href = "index.html";
+        });
+      });
+    </script>
+  </body>
+</html>

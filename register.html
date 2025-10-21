@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="javakeylogo.png">
+    <title>Register</title>
+    <script type="module" src="register.js" defer></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"/>
+    <link rel="stylesheet" href="register.css">
+  </head>
+  <body>
+    <div class="container">
+      <div class="left">
+        <img class="logo" src="javakeylogo.png">
+      </div>
+      <div class="right">
+        <div class="form-box">
+          <form action="index.html" method="post">
+            <label class="input-wrapper"><i class="fas fa-user">
+              </i><input type="text" id="name" name="fullname" placeholder="Full Name (Last Name, First Name M.I.)" required>
+            </label>
+            <label class="input-wrapper"><i class="fas fa-users"></i>
+              <select id="section" name="section" required>
+                <option value="" disabled selected>Section</option>
+                <option value="ICT 11-1A">ICT 11-1A</option>
+                <option value="ICT 11-2A">ICT 11-2A</option>
+                <option value="ICT 11-3A">ICT 11-3A</option>
+                <option value="ICT 11-4A">ICT 11-4A</option>
+                <option value="ICT 11-5A">ICT 11-5A</option>
+                <option value="ICT 11-1P">ICT 11-1P</option>
+                <option value="ICT 11-2P">ICT 11-2P</option>
+                <option value="ICT 11-3P">ICT 11-3P</option>
+                <option value="ICT 11-4P">ICT 11-4P</option>
+                <option value="ICT 11-5P">ICT 11-5P</option>
+              </select>
+            </label>
+            <label class="input-wrapper"><i class="fas fa-envelope"></i>
+              <input type="email" id="email" name="email" placeholder="Email (@spcc.edu.ph)" required>
+            </label>
+            <label class="input-wrapper"><i class="fas fa-lock">
+              </i><input type="password" id="password" name="password" placeholder="Password" required>
+            </label>
+            <label class="input-wrapper"><i class="fas fa-lock">
+              </i><input type="password" id="confirmpassword" name="confirm_password" placeholder="Confirm Password" required>
+            </label>
+            <p id="passwordError" class="error-message"></p>
+            <label class="checkbox">
+              <input type="checkbox" id="terms" required>
+              <span>I agree to the <a id="openModal" href="#">Terms & Conditions</a></span>
+            </label>
+            <button id="submit" type="submit">Register</button>
+          </form>
+          <div class="login-link">Already have an account? <a href="index.html">Log in</a></div>
+        </div>
+      </div>
+    </div>
+    <div id="termsModal" class="modal" aria-hidden="true" role="dialog" aria-labelledby="termsTitle">
+      <div class="modal-content" role="document">
+        <button class="close-btn" id="closeModal" aria-label="Close">&times;</button>
+        <h2 id="termsTitle">Terms and Conditions</h2>
+        <div class="terms-text">
+          <p>Welcome to <strong>JavaKey </strong>(“we,” “our,” or “us”). These Terms and Conditions (“Terms”) govern your use of our website and services. By accessing or using this website, you agree to comply with and be bound by these Terms. If you do not agree, please refrain from using our services.</p>
+          <br>
+          <p>The JavaKey is an educational platform designed to help students monitor their performance and progress in a learning-based game. To access certain features, users may be required to create an account by providing accurate and complete information, including their full name, email address, and section or class. Users are responsible for maintaining the confidentiality of their login credentials and for all activities that occur under their account. Sharing your account or impersonating another user is strictly prohibited.</p>
+          <br>
+          <p>By using our website, you agree to use it only for lawful purposes and in a manner that does not disrupt or interfere with others’ use of the platform. You must not attempt to hack, modify, or gain unauthorized access to the system, database, or network. Any misuse or violation of these Terms may result in suspension or permanent termination of your account.</p>
+          <br>
+          <p>We strive to provide accurate and reliable tracking of student progress; however, we do not guarantee that all information on the website will be completely error-free or uninterrupted. We reserve the right to modify, suspend, or discontinue any part of the website at any time without prior notice. We also reserve the right to update these Terms periodically, and any changes will be posted on this page with a new effective date. Continued use of the website after changes are posted constitutes acceptance of the revised Terms.</p>
+          <br>
+          <p>Users acknowledge that all content on the website, including text, graphics, logos, and design elements, is owned by the JavaKey Team and protected under applicable copyright and intellectual property laws. You may not copy, reproduce, or distribute any part of the website’s content without prior written consent from the developers.</p>
+          <br>
+          <p>We value your privacy and handle personal information in accordance with our Privacy Policy. By using the JavaKey Game Progress Tracker, you also agree to the terms outlined in our Privacy Policy regarding data collection, usage, and protection.</p>
+          <br>
+          <p>The JavaKey is provided “as is” and “as available.” We make no warranties, either express or implied, regarding its operation, performance, or the accuracy of results. We shall not be held liable for any direct or indirect damages arising from your use or inability to use the platform.</p>
+          <br>
+          <p>If you are a student, your access to the platform may be managed by your instructor or institution. We assume no responsibility for how instructors or schools use the collected progress data beyond the platform’s intended purpose.</p>
+          <br>
+          <p>If you have any questions or concerns regarding these Terms and Conditions, you may contact us at javakey.team@gmail.com</p>
+        </div>
+        <button class="accept-btn" id="acceptTerms">Accept</button>
+      </div>
+    </div>
+    <footer>&copy; 2025 JavaKey | <a>All Rights Reserved</a></footer>
+  </body>
+</html>

@@ -1,0 +1,259 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+  display: flex;
+  min-height: 100vh;
+  background-color: #121212;
+  color: #ffffff;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* SIDEBAR */
+.sidebar {
+  width: 240px;
+  background-color: #0ea400;
+  color: #ffffff;
+  padding: 20px;
+  transition: transform 0.3s ease;
+  position: relative;
+}
+
+.logo-container {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.logo {
+  display: block;
+  width: 150px;
+  margin: 0 auto 30px;
+}
+
+.sidebar a {
+  display: block;
+  color: #121212;
+  text-decoration: none;
+  padding: 12px 20px;
+  margin-bottom: 10px;
+  border-radius: 6px;
+  font-weight: bold;
+}
+
+.sidebar a:hover,
+.sidebar a.active {
+  background-color: #10bb00;
+  transition: background-color 0.5s ease;
+}
+
+.close-btn {
+  display: none;
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 26px;
+  cursor: pointer;
+}
+
+/* MAIN CONTENT */
+.main-content {
+  flex: 1;
+  padding: 25px;
+  transition: all 0.3s ease;
+}
+
+.header {
+  background-color: #1e1e1e;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+  color: #ffffff;
+}
+
+.header h1 {
+  font-size: 24px;
+  color: #ffffff;
+}
+
+.header p {
+  color: #cccccc;
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+.menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  color: #0ea400;
+  font-size: 26px;
+  cursor: pointer;
+}
+
+/* USER INFO & PROGRESS */
+.progress-container {
+  background-color: #1e1e1e;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  max-width: 600px;
+  margin: 0 auto;
+  text-align: center;
+  color: #ffffff;
+}
+
+.user-info h2 {
+  font-size: 22px;
+  margin-bottom: 5px;
+  color: #0ea400;
+}
+
+.user-info p {
+  font-size: 16px;
+  margin-bottom: 20px;
+  color: #cccccc;
+}
+
+.progress-bar-container {
+  text-align: left;
+}
+
+.progress-bar-container label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: #dddddd;
+}
+
+.progress-bar {
+  width: 100%;
+  background-color: #333;
+  border-radius: 10px;
+  height: 20px;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+.progress-fill {
+  height: 100%;
+  background-color: #0ea400;
+  width: 0%;
+  transition: width 0.5s ease;
+}
+
+#progressPercent {
+  font-size: 14px;
+  color: #bbbbbb;
+}
+
+/* FOOTER */
+footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 15px;
+  text-align: center;
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.05);
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+  color: #0ea400;
+  font-size: 0.9rem;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  body {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    transform: translateX(-100%);
+    z-index: 1000;
+    width: 230px;
+    transition: transform 0.3s ease;
+  }
+
+  .sidebar.active {
+    transform: translateX(0);
+  }
+
+  .close-btn {
+    display: block;
+  }
+
+  .menu-toggle {
+    display: block;
+  }
+
+  .header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    justify-content: left;
+  }
+
+  .main-content {
+    padding: 15px;
+  }
+
+  .progress-container {
+    width: 100%;
+  }
+}
+
+.table-container {
+  margin-top: 25px;
+  background-color: #1e1e1e;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+}
+
+.table-container h3 {
+  color: #0ea400;
+  margin-bottom: 15px;
+  text-align: left;
+}
+
+.progress-table {
+  width: 100%;
+  margin-top: 25px;
+  border-collapse: collapse;
+  background-color: #1e1e1e;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.progress-table th,
+.progress-table td {
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid #333;
+  color: #ffffff;
+}
+
+.progress-table th {
+  background-color: #0ea400;
+  color: #121212;
+  text-transform: uppercase;
+  font-size: 14px;
+}
+
+.progress-table tr:hover {
+  background-color: #2a2a2a;
+  transition: background-color 0.3s;
+}
